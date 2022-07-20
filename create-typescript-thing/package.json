@@ -13,9 +13,12 @@
     "url": "https://github.com/Zebreus/create-typescript-thing"
   },
   "devDependencies": {
+    "prettier": "^2.7.1",
+    "prettier-plugin-organize-imports": "^3.0.0",
     "typescript": "^4.7.4"
   },
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "format": "prettier ."
   }
 }
