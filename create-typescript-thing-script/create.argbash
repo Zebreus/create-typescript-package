@@ -20,8 +20,6 @@
 
 set +e
 
-
-
 PROJECT_PATH="$_arg_path"
 NAME="$_arg_name"
 VERSION="$_arg_initial_version"
@@ -199,6 +197,7 @@ cp_resource_file example.test.ts src/tests/example.test.ts
 jqi tsconfig.json '.exclude |= (.+ ["src/tests"] | unique)'
 jqi .eslintrc.json '.extends |= (.+ ["plugin:jest/recommended"] | unique)'
 jqi .eslintrc.json '.rules["jest/expect-expect"] = "off"'
+add_script "test" "jest"
 git add .
 git commit -m "Install jest"
 
