@@ -22,7 +22,7 @@ set +e
 
 
 
-PROJECT_PATH="$_arg_name"
+PROJECT_PATH="$_arg_path"
 NAME="$_arg_name"
 VERSION="$_arg_initial_version"
 DESCRIPTION="$_arg_description"
