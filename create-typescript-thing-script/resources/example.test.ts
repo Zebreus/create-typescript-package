@@ -11,3 +11,5 @@ describe("some examples work", () => {
     expect(() => {throw new Error("eyyy")}).toThrow();
   })
 });
+
+export {}
