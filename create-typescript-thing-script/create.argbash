@@ -254,6 +254,7 @@ then
   add_script "build" "ncc build --out dist --minify src/index.ts"
   append_script "prepack" "ncc build --out dist --minify src/index.ts"
   append_script "prepublish" "eslint --cache && tsc --noEmit"
+  add_script "start" "ncc run src/index.ts"
   mkdir -p src
   cp_resource_file applicationIndex.ts src/index.ts
   git add .
