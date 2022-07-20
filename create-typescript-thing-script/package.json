@@ -17,8 +17,8 @@
     "create-typescript-thing-script": "create.sh"
   },
   "scripts": {
-    "build": "argbash create.argbash > temp.sh && bash pack.sh temp.sh create.sh",
-    "prepack": "argbash create.argbash > temp.sh && bash pack.sh temp.sh create.sh"
+    "build": "argbash create.argbash > temp.sh && bash pack.sh temp.sh create.sh && rm temp.sh",
+    "prepack": "argbash create.argbash > temp.sh && bash pack.sh temp.sh create.sh && rm temp.sh"
   },
   "files": [
     "create.sh"
