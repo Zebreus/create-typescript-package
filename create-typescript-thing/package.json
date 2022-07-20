@@ -11,5 +11,11 @@
     "directory": "create-typescript-thing/",
     "type": "git",
     "url": "https://github.com/Zebreus/create-typescript-thing"
+  },
+  "devDependencies": {
+    "typescript": "^4.7.4"
+  },
+  "scripts": {
+    "build": "tsc"
   }
 }
