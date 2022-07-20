@@ -165,7 +165,7 @@ git add .
 git commit -m "Initialize node project"
 
 # Add typescript
-yarn add --dev typescript@latest
+yarn add --dev typescript@latest @types/node@latest
 cp_resource_file tsconfig.json .
 mkdir -p src
 add_gitignore dist/ typescript
