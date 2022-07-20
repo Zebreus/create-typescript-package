@@ -30,7 +30,6 @@
         "ignoreRestSiblings": true
       }
     ],
-    // Import styling
     "import/first": "error",
     "import/no-duplicates": [
       "error",
@@ -72,7 +71,6 @@
     ],
     "import/newline-after-import": "error",
     "import/no-anonymous-default-export": "error",
-    //Static import analysis
     "import/no-unresolved": "error",
     "import/named": "off",
     "import/default": "error",
