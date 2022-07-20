@@ -1,6 +1,6 @@
 {
   "name": "create-typescript-thing-script",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "main": "create.sh",
   "license": "MIT",
   "description": "Description text",
