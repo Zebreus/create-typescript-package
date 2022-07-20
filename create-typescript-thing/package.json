@@ -1,0 +1,15 @@
+{
+  "name": "create-typescript-thing",
+  "version": "0.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "author": {
+    "name": "Zebreus",
+    "email": "lennarteichhorn@googlemail.com"
+  },
+  "repository": {
+    "directory": "create-typescript-thing/",
+    "type": "git",
+    "url": "https://github.com/Zebreus/create-typescript-thing"
+  }
+}
