@@ -2,16 +2,22 @@
 
 set +e
 
+PROJECT_PATH="project"
+RESOURCE_PATH="$(pwd)/resources/"
 NAME="my-test-project"
-VERSION="0.0.1"
+VERSION="0.0.0"
 DESCRIPTION="Description text"
-AUTHOR="Author name"
+AUTHOR_NAME="Author name"
+AUTHOR_EMAIL="author@email.com"
 LICENSE="MIT"
 
 TYPE="application"
+# TYPE="library"
 
 # True if the project is the root of a git repo, false if the project is nested in another git repo.
 GIT_ROOT=true
+GIT_ORIGIN="git@github.com:Zebreus/create-typescript-thing.git"
+GIT_MAIN_BRANCH="master"
 
 jqi() {
     file=$1
@@ -59,13 +65,24 @@ add_gitignore() {
     add_ignore .gitignore "$1" "$2"
 }
 
-mkdir -p $NAME
-cd $NAME
+mkdir -p $PROJECT_PATH
+cd $PROJECT_PATH
 
 # Make sure we are inside a git repo
 if $GIT_ROOT && ! test -e .git
 then
-    git init
+    git init -b "$GIT_MAIN_BRANCH"
+    if test -n "$GIT_ORIGIN"
+    then
+        git remote add origin "$GIT_ORIGIN"
+        git pull -f --set-upstream origin "$GIT_MAIN_BRANCH"
+    fi
+else
+    if test -n "$GIT_ORIGIN" && test "$(git remote get-url origin)" != "$GIT_ORIGIN"
+    then
+        echo "You specified an origin for your git repo, but the project is already a git repo with a different origin." >&2
+        exit 1
+    fi
 fi
 
 if ! git rev-parse --is-inside-work-tree
@@ -74,16 +91,45 @@ then
     exit 1
 fi
 
+# Ensure that package.json does not already exist
+if test -e package.json
+then
+    echo "package.json already exists" >&2
+    exit 1
+fi
+
 # Add nix-shell
-cp ../resources/shell.nix .
+cp "$RESOURCE_PATH"shell.nix .
 git add .
 git commit -m "Add nix shell"
 
 # Initialize project
 yarn init --yes
-jqi package.json ".version = \"$VERSION\""
-jqi package.json ".description = \"$DESCRIPTION\""
-jqi package.json ".author = \"$AUTHOR\""
+test -z "$VERSION" || jqi package.json ".version = \"$VERSION\""
+test -z "$DESCRIPTION" || jqi package.json ".description = \"$DESCRIPTION\""
+jqi package.json "del(.author)"
+test -z "$AUTHOR_NAME" || jqi package.json ".author.name = \"$AUTHOR_NAME\""
+test -z "$AUTHOR_EMAIL" || jqi package.json ".author.email = \"$AUTHOR_EMAIL\""
+jqi package.json "del(.repository)"
+if ! $GIT_ROOT
+then
+    GIT_ORIGIN="$(git remote get-url origin)"
+    jqi package.json ".repository.directory = \"$(git rev-parse --show-prefix)\""
+fi
+if test -n "$GIT_ORIGIN"
+then
+    jqi package.json ".repository.type = \"git\""
+    if echo "$GIT_ORIGIN" | grep -Po "^https://"
+    then
+        jqi package.json ".repository.url = \"$GIT_ORIGIN\""
+    elif echo "$GIT_ORIGIN" | grep -Po "^git@"
+    then
+        value="$(echo "$GIT_ORIGIN" | sed 's/:/\//' | sed 's/^git@/https:\/\//' | sed 's/.git$//')"
+        jqi package.json ".repository.url = \"$value\""
+    else
+        jqi package.json ".repository.url = \"$GIT_ORIGIN\""
+    fi
+fi
 jqi package.json ".license = \"$LICENSE\""
 add_gitignore "node_modules" "node"
 git add .
@@ -91,7 +137,7 @@ git commit -m "Initialize node project"
 
 # Add typescript
 yarn add --dev typescript@latest
-cp ../resources/tsconfig.json .
+cp "$RESOURCE_PATH"tsconfig.json .
 mkdir -p src
 add_gitignore dist/ typescript
 add_gitignore '*.tsbuildinfo' typescript
@@ -101,14 +147,14 @@ git commit -m "Install typescript"
 
 # Add prettier
 yarn add --dev prettier@latest prettier-plugin-organize-imports
-cp ../resources/.prettierrc.js .
+cp "$RESOURCE_PATH".prettierrc.js .
 add_script "format" "prettier ."
 git add .
 git commit -m "Install prettier"
 
 # Add eslint
 yarn add --dev eslint @types/eslint @typescript-eslint/eslint-plugin@latest @typescript-eslint/parser@latest eslint-plugin-import@latest
-cp ../resources/.eslintrc.json .
+cp "$RESOURCE_PATH".eslintrc.json .
 add_script "lint" "eslint --cache && tsc --noEmit"
 add_gitignore ".eslintcache" "eslint"
 git add .
@@ -116,9 +162,9 @@ git commit -m "Install eslint"
 
 # Add jest
 yarn add --dev jest@latest @types/jest@latest ts-jest@latest ts-node@latest eslint-plugin-jest@latest
-cp ../resources/jest.config.js .
+cp "$RESOURCE_PATH"jest.config.js .
 mkdir -p src/tests
-cp ../resources/example.test.ts src/tests/example.test.ts
+cp "$RESOURCE_PATH"example.test.ts src/tests/example.test.ts
 jqi tsconfig.json '.exclude |= (.+ ["src/tests"] | unique)'
 jqi .eslintrc.json '.extends |= (.+ ["plugin:jest/recommended"] | unique)'
 jqi .eslintrc.json '.rules["jest/expect-expect"] = "off"'
@@ -127,7 +173,7 @@ git commit -m "Install jest"
 
 # Add lint-staged
 yarn add --dev lint-staged@latest tsc-files@latest
-cp ../resources/.lintstagedrc.json .
+cp "$RESOURCE_PATH".lintstagedrc.json .
 git add .
 git commit -m "Install lint-staged"
 
@@ -146,8 +192,8 @@ fi
 
 # Add vscode presets
 mkdir -p .vscode
-cp ../resources/extensions.json ./.vscode
-cp ../resources/settings.json ./.vscode
+cp "$RESOURCE_PATH"extensions.json ./.vscode
+cp "$RESOURCE_PATH"settings.json ./.vscode
 git add .
 git commit -m "Add vscode extensions and settings"
 
@@ -162,7 +208,7 @@ then
   append_script "prepack" "ncc build --out dist --minify src/index.ts"
   append_script "prepublish" "eslint --cache && tsc --noEmit"
   mkdir -p src
-  cp ../resources/libraryIndex.ts src/index.ts
+  cp "$RESOURCE_PATH"libraryIndex.ts src/index.ts
   git add .
   git commit -m "Configured project as library"
 fi
@@ -179,7 +225,7 @@ then
   append_script "prepack" "ncc build --out dist --minify src/index.ts"
   append_script "prepublish" "eslint --cache && tsc --noEmit"
   mkdir -p src
-  cp ../resources/applicationIndex.ts src/index.ts
+  cp "$RESOURCE_PATH"applicationIndex.ts src/index.ts
   git add .
   git commit -m "Configured project as application"
 fi
