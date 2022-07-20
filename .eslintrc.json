@@ -7,7 +7,8 @@
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
-    "plugin:@typescript-eslint/recommended"
+    "plugin:@typescript-eslint/recommended",
+    "plugin:jest/recommended"
   ],
   "plugins": [
     "import",
@@ -87,7 +88,8 @@
     "import/export": "error",
     "import/no-unused-modules": "error",
     "import/no-deprecated": "error",
-    "import/no-named-as-default-member": "warn"
+    "import/no-named-as-default-member": "warn",
+    "jest/expect-expect": "off"
   },
   "overrides": [
     {
