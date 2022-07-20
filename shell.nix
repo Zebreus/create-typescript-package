@@ -1,13 +1,14 @@
-{ pkgs ? import <nixpkgs> {} }:
+{ pkgs ? import <nixpkgs> { } }:
 with pkgs;
 mkShell {
-  nativeBuildInputs = [ 
+  nativeBuildInputs = [
     nodejs-18_x
     yarn
-    terraform
     git
     jq
-  ] ++ (if stdenv.isDarwin then [  ] else [ docker docker-compose]);
+    moreutils
+    argbash
+  ];
   shellHook = with pkgs; ''
     export PATH="$(pwd)/node_modules/.bin:$PATH"
   '';
