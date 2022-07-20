@@ -17,11 +17,10 @@
     "create-typescript-thing-script": "create.sh"
   },
   "scripts": {
-    "build": "argbash create.argbash > create.sh",
-    "prepack": "argbash create.argbash > create.sh"
+    "build": "argbash create.argbash > temp.sh && bash pack.sh temp.sh create.sh",
+    "prepack": "argbash create.argbash > temp.sh && bash pack.sh temp.sh create.sh"
   },
   "files": [
-    "create.sh",
-    "resources"
+    "create.sh"
   ]
 }
