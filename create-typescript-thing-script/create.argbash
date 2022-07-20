@@ -39,7 +39,10 @@ GIT_ORIGIN="$_arg_git_origin"
 GIT_MAIN_BRANCH="$_arg_git_main_branch"
 
 SCRIPTPATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
-RESOURCE_PATH="$SCRIPTPATH/resources/"
+
+# resource="$1"
+# target="$2"
+cp_resource_file() { cp "$SCRIPTPATH/resources/$1" "$2" ; }
 
 jqi() {
     file=$1
@@ -127,7 +130,7 @@ then
 fi
 
 # Add nix-shell
-cp "$RESOURCE_PATH"shell.nix .
+cp_resource_file shell.nix .
 git add .
 git commit -m "Add nix shell"
 
@@ -165,7 +168,7 @@ git commit -m "Initialize node project"
 
 # Add typescript
 yarn add --dev typescript@latest
-cp "$RESOURCE_PATH"tsconfig.json .
+cp_resource_file tsconfig.json .
 mkdir -p src
 add_gitignore dist/ typescript
 add_gitignore '*.tsbuildinfo' typescript
@@ -175,14 +178,14 @@ git commit -m "Install typescript"
 
 # Add prettier
 yarn add --dev prettier@latest prettier-plugin-organize-imports
-cp "$RESOURCE_PATH".prettierrc.js .
+cp_resource_file .prettierrc.js .
 add_script "format" "prettier ."
 git add .
 git commit -m "Install prettier"
 
 # Add eslint
 yarn add --dev eslint @types/eslint @typescript-eslint/eslint-plugin@latest @typescript-eslint/parser@latest eslint-plugin-import@latest
-cp "$RESOURCE_PATH".eslintrc.json .
+cp_resource_file .eslintrc.json .
 add_script "lint" "eslint --cache && tsc --noEmit"
 add_gitignore ".eslintcache" "eslint"
 git add .
@@ -190,9 +193,9 @@ git commit -m "Install eslint"
 
 # Add jest
 yarn add --dev jest@latest @types/jest@latest ts-jest@latest ts-node@latest eslint-plugin-jest@latest
-cp "$RESOURCE_PATH"jest.config.js .
+cp_resource_file jest.config.js .
 mkdir -p src/tests
-cp "$RESOURCE_PATH"example.test.ts src/tests/example.test.ts
+cp_resource_file example.test.ts src/tests/example.test.ts
 jqi tsconfig.json '.exclude |= (.+ ["src/tests"] | unique)'
 jqi .eslintrc.json '.extends |= (.+ ["plugin:jest/recommended"] | unique)'
 jqi .eslintrc.json '.rules["jest/expect-expect"] = "off"'
@@ -201,7 +204,7 @@ git commit -m "Install jest"
 
 # Add lint-staged
 yarn add --dev lint-staged@latest tsc-files@latest
-cp "$RESOURCE_PATH".lintstagedrc.json .
+cp_resource_file .lintstagedrc.json .
 git add .
 git commit -m "Install lint-staged"
 
@@ -220,8 +223,8 @@ fi
 
 # Add vscode presets
 mkdir -p .vscode
-cp "$RESOURCE_PATH"extensions.json ./.vscode
-cp "$RESOURCE_PATH"settings.json ./.vscode
+cp_resource_file extensions.json ./.vscode
+cp_resource_file settings.json ./.vscode
 git add .
 git commit -m "Add vscode extensions and settings"
 
@@ -236,7 +239,7 @@ then
   append_script "prepack" "ncc build --out dist --minify src/index.ts"
   append_script "prepublish" "eslint --cache && tsc --noEmit"
   mkdir -p src
-  cp "$RESOURCE_PATH"libraryIndex.ts src/index.ts
+  cp_resource_file libraryIndex.ts src/index.ts
   git add .
   git commit -m "Configured project as library"
 fi
@@ -253,7 +256,7 @@ then
   append_script "prepack" "ncc build --out dist --minify src/index.ts"
   append_script "prepublish" "eslint --cache && tsc --noEmit"
   mkdir -p src
-  cp "$RESOURCE_PATH"applicationIndex.ts src/index.ts
+  cp_resource_file applicationIndex.ts src/index.ts
   git add .
   git commit -m "Configured project as application"
 fi
