@@ -1,7 +1,7 @@
 {
     "name": "create-typescript-thing-script",
     "version": "0.0.0",
-    "main": "dist/create.sh",
+    "main": "create.sh",
     "license": "MIT",
     "description": "Description text",
     "author": {
@@ -14,11 +14,15 @@
       "directory": "create-typescript-thing-script"
     },
     "bin": {
-      "create-typescript-thing-script": "dist/create.sh"
+      "create-typescript-thing-script": "create.sh"
     },
     "scripts": {
-        "build": "mkdir -p dist && argbash create.argbash > dist/create.sh",
-        "prepack": "mkdir -p dist && argbash create.argbash > dist/create.sh && cp -r src/resources dist"
-    }
+        "build": "argbash create.argbash > create.sh",
+        "prepack": "argbash create.argbash > create.sh"
+    },
+    "files": [
+      "create.sh",
+      "resources"
+    ]
   }
   
