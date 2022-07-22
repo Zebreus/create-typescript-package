@@ -177,7 +177,7 @@ git commit -m "Install typescript"
 # Add prettier
 yarn add --dev prettier@latest prettier-plugin-organize-imports
 cp_resource_file .prettierrc.js .
-add_script "format" "prettier ."
+add_script "format" "prettier --write ."
 git add .
 git commit -m "Install prettier"
 
