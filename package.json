@@ -1,6 +1,6 @@
 {
   "name": "create-typescript-thing",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "main": "dist/index.js",
   "license": "MIT",
   "author": {
@@ -31,7 +31,12 @@
     "ts-jest": "^28.0.7",
     "ts-node": "^10.9.1",
     "tsc-files": "^1.1.3",
-    "typescript": "^4.7.4"
+    "typescript": "^4.7.4",
+    "node-fetch": "^3.2.9",
+    "ora": "^6.1.2",
+    "prompts": "^2.4.2",
+    "validate-npm-package-name": "^4.0.0",
+    "chalk": "4"
   },
   "scripts": {
     "build": "ncc build -e create-typescript-thing-script --out dist --minify src/index.ts && sed '1s;^;#!/usr/bin/env node\\n;' dist/index.js -i && chmod a+x dist/index.js",
@@ -54,11 +59,6 @@
     "create-typescript-thing": "dist/index.js"
   },
   "dependencies": {
-    "chalk": "4",
-    "create-typescript-thing-script": "^0.3.4",
-    "node-fetch": "^3.2.9",
-    "ora": "^6.1.2",
-    "prompts": "^2.4.2",
-    "validate-npm-package-name": "^4.0.0"
+    "create-typescript-thing-script": "^0.3.4"
   }
 }
