@@ -1,7 +1,7 @@
 {
   "name": "create-typescript-thing-script",
   "version": "0.2.2",
-  "main": "create.sh",
+  "main": "index.js",
   "license": "MIT",
   "description": "Description text",
   "author": {
@@ -17,10 +17,16 @@
     "create-typescript-thing-script": "create.sh"
   },
   "scripts": {
-    "build": "argbash create.argbash > temp.sh && bash pack.sh temp.sh create.sh && rm temp.sh",
-    "prepack": "argbash create.argbash > temp.sh && bash pack.sh temp.sh create.sh && rm temp.sh"
+    "build": "argbash create.argbash > temp.sh && bash pack.sh temp.sh create.sh && rm temp.sh && tsc --noEmit false",
+    "prepack": "argbash create.argbash > temp.sh && bash pack.sh temp.sh create.sh && rm temp.sh && tsc --noEmit false"
   },
   "files": [
-    "create.sh"
-  ]
+    "create.sh",
+    "index.js",
+    "index.d.ts"
+  ],
+  "devDependencies": {
+    "@types/node": "^18.0.6",
+    "typescript": "^4.7.4"
+  }
 }

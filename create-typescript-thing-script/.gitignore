@@ -1,2 +1,5 @@
 create.sh
 node_modules
+*.tsbuildinfo
+index.js
+index.d.ts
