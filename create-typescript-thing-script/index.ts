@@ -32,7 +32,8 @@ export type PackageSettings = {
 }
 
 export const createTypescriptThingScript = async (settings: PackageSettings) => {
-    const script = `/usr/bin/env bash ${path.resolve(__dirname, "create.sh")}`
+    let packagePath = path.dirname(require.resolve("./index"));
+    const script = `/usr/bin/env bash ${path.resolve(packagePath, "create.sh")}`
     const command = script + 
     (settings.path ? " --path " + settings.path : "")
     + (settings.name ? " --name " + settings.name : "")
