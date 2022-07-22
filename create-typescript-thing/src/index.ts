@@ -414,12 +414,21 @@ const selectMonorepo = async (settings: PackageSettings) => {
     { onCancel }
   )
 
-  const parsedOrigin = (await sh("git remote get-url origin")).stdout.trim()
+  const pathInfo = getPathInfo(settings)
+
+  if (!pathInfo) {
+    throw new Error("At this point a path should have been specified.")
+  }
+
+  const parsedOrigin = (await sh(`cd ${pathInfo.firstExistingPathUp} && git remote get-url origin`)).stdout.trim()
+
+  const wasMonorepo =
+    !result.monorepo && pathInfo.firstExistingPathUp !== pathInfo.absolutePath && pathInfo.gitOrigin === parsedOrigin
 
   return {
     ...settings,
     monorepo: result.monorepo as boolean,
-    repo: result.monorepo && parsedOrigin && !settings.repo ? parsedOrigin : settings.repo,
+    repo: result.monorepo && parsedOrigin && !settings.repo ? parsedOrigin : wasMonorepo ? undefined : settings.repo,
   }
 }
 
