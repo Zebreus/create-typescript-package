@@ -123,7 +123,7 @@ fi
 
 if ! git rev-parse --is-inside-work-tree
 then
-    echo "The project has to be inside a nested git repo, if GIT_ROOT is false" >&2
+    echo "The project has to be inside a git repository" >&2
     exit 1
 fi
 
