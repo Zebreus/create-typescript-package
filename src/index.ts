@@ -660,19 +660,23 @@ const reviewSettings = async (settings: PackageSettings): Promise<PackageSetting
 }
 
 ;(async () => {
-  const initialSettings = await guessGitAccount(
-    await addAuthorInfo({
-      type: "library",
-      invokeDirectory: path.normalize(process.cwd()),
-      pathInfos: {},
-    } as PackageSettings)
-  )
+  const initialSettings = addAuthorInfo({
+    type: "library",
+    invokeDirectory: path.normalize(process.cwd()),
+    pathInfos: {},
+  } as PackageSettings).then(settings => guessGitAccount(settings))
 
   //TODO: Determine author name
 
-  const s1 = await selectType(initialSettings)
+  const s1 = await selectType({
+    type: "library",
+    invokeDirectory: path.normalize(process.cwd()),
+    pathInfos: {},
+  })
 
-  const s2 = await selectName(s1)
+  const s11 = { ...(await initialSettings), type: s1.type }
+
+  const s2 = await selectName(s11)
 
   const pathInfo = getPathInfo(s2)
 
