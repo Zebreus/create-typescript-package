@@ -1,6 +1,6 @@
 {
   "name": "create-typescript-thing",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "main": "dist/index.js",
   "license": "MIT",
   "author": {
@@ -34,16 +34,16 @@
     "typescript": "^4.7.4"
   },
   "scripts": {
-    "build": "ncc build -e create-typescript-thing-script --out dist --minify src/index.ts",
+    "build": "ncc build -e create-typescript-thing-script --out dist --minify src/index.ts && sed '1s;^;#!/usr/bin/env node\n;' dist/index.js -i",
     "format": "prettier .",
     "lint": "eslint --cache && tsc --noEmit",
     "test": "jest",
-    "prepack": "ncc build -e create-typescript-thing-script --out dist --minify src/index.ts",
+    "prepack": "ncc build -e create-typescript-thing-script --out dist --minify src/index.ts && sed '1s;^;#!/usr/bin/env node\n;' dist/index.js -i",
     "prepublish": "eslint --cache && tsc --noEmit",
     "start": "ncc run -e create-typescript-thing-script src/index.ts"
   },
   "files": [
-    "dist/**"
+    "dist/index.js"
   ],
   "keywords": [
     "application",
