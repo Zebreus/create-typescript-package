@@ -1,4 +1,5 @@
 import { blue, red } from "chalk"
+import createTypescriptThingScript from "create-typescript-thing-script"
 import { existsSync } from "fs"
 import fetch from "node-fetch"
 import { userInfo } from "os"
@@ -570,7 +571,6 @@ const reviewSettings = async (settings: PackageSettings): Promise<PackageSetting
   }
 }
 
-console.log("You launched the application!")
 ;(async () => {
   const initialSettings = await guessGitAccount(
     await addAuthorInfo({
@@ -600,7 +600,7 @@ console.log("You launched the application!")
 
   const s3 = await reviewSettings(s22)
 
-  console.log("Your settings ", s3)
+  await createTypescriptThingScript(s3)
 })()
 
 export {}
