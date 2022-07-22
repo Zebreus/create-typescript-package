@@ -57,6 +57,7 @@
     "chalk": "4",
     "create-typescript-thing-script": "^0.3.4",
     "node-fetch": "^3.2.9",
+    "ora": "^6.1.2",
     "prompts": "^2.4.2",
     "validate-npm-package-name": "^4.0.0"
   }
