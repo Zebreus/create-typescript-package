@@ -93,9 +93,11 @@ const addPathInfo = async (settings: PackageSettings): Promise<PackageSettings> 
 
   const pathExists = firstExistingPathUp === targetPath
   const inGitTree =
-    (await sh(`cd ${firstExistingPathUp} ; git rev-parse --is-inside-work-tree`)).stdout.trim() === "true"
+    (
+      await sh(`cd ${firstExistingPathUp} ; git rev-parse --is-inside-work-tree`).catch(() => ({ stdout: "false" }))
+    ).stdout.trim() === "true"
   const gitOrigin = inGitTree
-    ? (await sh(`cd ${firstExistingPathUp} ; git remote get-url origin`)).stdout.trim()
+    ? (await sh(`cd ${firstExistingPathUp} ; git remote get-url origin`).catch(() => undefined))?.stdout.trim()
     : undefined
 
   const isGitRoot = pathExists && existsSync(path.resolve(firstExistingPathUp, ".git"))
@@ -483,7 +485,9 @@ const selectMonorepo = async (settings: PackageSettings) => {
     throw new Error("At this point a path should have been specified.")
   }
 
-  const parsedOrigin = (await sh(`cd ${pathInfo.firstExistingPathUp} && git remote get-url origin`)).stdout.trim()
+  const parsedOrigin = (
+    await sh(`cd ${pathInfo.firstExistingPathUp} && git remote get-url origin`).catch(() => ({ stdout: "" }))
+  ).stdout.trim()
 
   const wasMonorepo =
     !result.monorepo && pathInfo.firstExistingPathUp !== pathInfo.absolutePath && pathInfo.gitOrigin === parsedOrigin
