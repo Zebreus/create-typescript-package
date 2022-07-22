@@ -71,7 +71,7 @@
     ],
     "import/newline-after-import": "error",
     "import/no-anonymous-default-export": "error",
-    "import/no-unresolved": "error",
+    "import/no-unresolved": "off",
     "import/named": "off",
     "import/default": "error",
     "import/namespace": "error",
