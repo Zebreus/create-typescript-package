@@ -34,11 +34,11 @@
     "typescript": "^4.7.4"
   },
   "scripts": {
-    "build": "ncc build --out dist --minify src/index.ts",
+    "build": "ncc build -e create-typescript-thing-script --out dist --minify src/index.ts",
     "format": "prettier .",
     "lint": "eslint --cache && tsc --noEmit",
     "test": "jest",
-    "prepack": "ncc build --out dist --minify src/index.ts",
+    "prepack": "ncc build -e create-typescript-thing-script --out dist --minify src/index.ts",
     "prepublish": "eslint --cache && tsc --noEmit",
     "start": "ncc run src/index.ts"
   },
@@ -55,6 +55,7 @@
   },
   "dependencies": {
     "chalk": "4",
+    "create-typescript-thing-script": "^0.3.2",
     "node-fetch": "^3.2.9",
     "prompts": "^2.4.2",
     "validate-npm-package-name": "^4.0.0"
