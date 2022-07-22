@@ -9,4 +9,4 @@ module.exports = {
       statements: 95,
     },
   },
-};
+}
