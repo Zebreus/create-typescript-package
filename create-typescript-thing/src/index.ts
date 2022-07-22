@@ -719,7 +719,7 @@ const reviewSettings = async (settings: PackageSettings): Promise<PackageSetting
   const textChange = setInterval(() => {
     spinner.text = texts[nextText]
     nextText = (nextText + 1) % texts.length
-  }, 30000)
+  }, 20000)
 
   try {
     await projectPromise
