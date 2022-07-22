@@ -2,10 +2,7 @@
   "compilerOptions": {
     "incremental": true,
     "target": "es2016",
-    "lib": [
-      "es2016",
-      "esnext"
-    ],
+    "lib": ["es2016", "esnext"],
     "jsx": "preserve",
     "module": "commonjs",
     "rootDir": "src",
@@ -23,10 +20,6 @@
     "strict": true,
     "skipLibCheck": true
   },
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "src/tests"
-  ]
+  "include": ["src"],
+  "exclude": ["src/tests"]
 }

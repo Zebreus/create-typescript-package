@@ -1,14 +1,5 @@
 {
-    "*.+(ts|tsx)": [
-        "prettier --write",
-        "eslint --cache --fix",
-        "tsc-files --noEmit"
-    ],
-    "*.+(js|jsx)": [
-        "prettier --write",
-        "eslint --cache --fix"
-    ],
-    "*.+(json|css|md|yml|yaml|scss)": [
-        "prettier --write"
-    ]
+  "*.+(ts|tsx)": ["prettier --write", "eslint --cache --fix", "tsc-files --noEmit"],
+  "*.+(js|jsx)": ["prettier --write", "eslint --cache --fix"],
+  "*.+(json|css|md|yml|yaml|scss)": ["prettier --write"]
 }
