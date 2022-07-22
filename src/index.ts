@@ -135,7 +135,7 @@ const addAuthorInfo = async (settings: PackageSettings): Promise<PackageSettings
 }
 
 const validateGitRepo = async (gitUrl: string) => {
-  return (await sh(`git ls-remote ${gitUrl}`)).stdout.includes("HEAD")
+  return (await sh(`git ls-remote ${gitUrl}`).catch(() => ({ stdout: "" })))?.stdout?.includes("HEAD")
 }
 
 const buildGitRepoUrl = (type: "github" | "gitlab", username: string, name: string) => {
@@ -504,11 +504,11 @@ const selectOrigin = async (settings: PackageSettings) => {
   const result = await prompts(
     {
       type: "text",
-      name: "origin",
+      name: "repo",
       message: "Do you already have a git repository? (Leave empty to skip)",
       initial: settings.repo || defaultRepoUrl,
-      validate: origin =>
-        origin.startsWith("http") || origin.startsWith("git@") || origin.startsWith("ssh") || origin === ""
+      validate: repo =>
+        repo.startsWith("http") || repo.startsWith("git@") || repo.startsWith("ssh") || repo === ""
           ? true
           : "Please enter a valid git repository URL",
     },
@@ -517,12 +517,23 @@ const selectOrigin = async (settings: PackageSettings) => {
 
   return {
     ...settings,
-    origin: (result.origin || undefined) as string | undefined,
+    repo: (result.repo || undefined) as string | undefined,
   }
 }
 
+const awaitWithTimeout = async <T>(promise: Promise<T>, timeout: number, defaultValue: T): Promise<T> => {
+  const timeoutPromise = new Promise<T>((resolve, reject) => {
+    setTimeout(() => {
+      defaultValue !== undefined ? resolve(defaultValue) : reject(new Error("Timeout"))
+    }, timeout)
+  })
+
+  return await Promise<T>.race([promise, timeoutPromise])
+}
+
 const reviewSettings = async (settings: PackageSettings): Promise<PackageSettings> => {
-  const repoExists = settings.repo && (await validateGitRepo(settings.repo))
+  const repoExists = settings.repo ? validateGitRepo(settings.repo) : (async () => true)()
+  const shortTimeoutRepoExists = (repoExists && (await awaitWithTimeout(repoExists, 100, true))) || false
 
   console.log(`I will create the ${blue(settings.type)} package ${blue(settings.name)} into ${blue(settings.path)}`)
   // if (settings.authorName || settings.authorEmail) {
@@ -543,7 +554,7 @@ const reviewSettings = async (settings: PackageSettings): Promise<PackageSetting
     if (settings.repo) {
       console.log(
         `I will use the git repository at ${blue(settings.repo)} as the remote repository.
-        ${!repoExists ? red("The repository does not exist, please create it before continuing.") : ""}`
+        ${!shortTimeoutRepoExists ? red("The repository does not exist, please create it before continuing.") : ""}`
       )
     } else {
       console.log(
@@ -556,7 +567,7 @@ const reviewSettings = async (settings: PackageSettings): Promise<PackageSetting
     ...(settings.type ? [] : ["type"]),
     ...(settings.name ? [] : ["name"]),
     ...(settings.path ? [] : ["path"]),
-    ...(settings.repo && !repoExists ? ["repo"] : []),
+    ...(settings.repo && !shortTimeoutRepoExists ? ["repo"] : []),
   ]
 
   const result = await prompts(
@@ -616,8 +627,13 @@ const reviewSettings = async (settings: PackageSettings): Promise<PackageSetting
   )
 
   switch (result.selection) {
-    case "create":
+    case "create": {
+      if (settings.repo && !(await repoExists)) {
+        console.log(red("The repository does not exist, please create it before continuing."))
+        return reviewSettings(settings)
+      }
       return settings
+    }
     case "type":
       return reviewSettings(await selectType(settings))
     case "name":
@@ -636,10 +652,6 @@ const reviewSettings = async (settings: PackageSettings): Promise<PackageSetting
       return reviewSettings(await selectMonorepo(settings))
     default:
       throw new Error("Unexpected selection")
-  }
-
-  return {
-    ...settings,
   }
 }
 
