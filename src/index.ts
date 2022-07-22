@@ -61,6 +61,8 @@ type PackageSettings = {
   gitEmail?: string
   osUsername?: string
   gitAccount?: GitAccountInfo
+  // True if the path was explicitly set
+  explicitPath?: boolean
 }
 
 const onCancel = () => {
@@ -289,12 +291,13 @@ const selectType = async (settings: PackageSettings) => {
   }
 }
 
-const selectName = async (settings: PackageSettings) => {
-  const defaultPackageNameFromPath = normalizeString(
-    path.basename(path.normalize(path.resolve(settings.invokeDirectory, settings.path || ".")))
-  )
+/** Check if a packae can be created in directory */
+const checkPath = (directory: string) => {
+  return !existsSync(path.resolve(directory, "package.json"))
+}
 
-  const invalidProjectNames = [
+const checkDefaultPackageName = (name: string, settings: PackageSettings, directory?: string) => {
+  const validProjectName = ![
     "home",
     "root",
     "user",
@@ -313,21 +316,77 @@ const selectName = async (settings: PackageSettings) => {
     path.basename(userInfo().username),
     ".",
     "-",
+  ].includes(name)
+
+  const validPath = settings.explicitPath ? true : checkPath(path.resolve(settings.invokeDirectory, directory || name))
+
+  const validName = validate(name).validForNewPackages
+
+  return validProjectName && validPath && validName
+}
+
+const recommendNewPackageName = (settings: PackageSettings) => {
+  const defaultNames = [
+    ...(settings.name
+      ? [
+          {
+            name: settings.name,
+            dir: settings.path || settings.name,
+          },
+        ]
+      : []),
+    ...(settings.path && settings.explicitPath
+      ? [
+          {
+            name: normalizeString(path.basename(path.normalize(path.resolve(settings.invokeDirectory, settings.path)))),
+            dir: settings.path,
+          },
+        ]
+      : []),
+    {
+      name: normalizeString(path.basename(path.normalize(path.resolve(settings.invokeDirectory)))),
+      dir: ".",
+    },
+    {
+      name: `fancy-${settings.type || "package"}`,
+      dir: `./fancy-${settings.type || "package"}`,
+    },
+    {
+      name: `cool-${settings.type || "package"}`,
+      dir: `./cool-${settings.type || "package"}`,
+    },
+    {
+      name: `flamboyant-${settings.type || "package"}`,
+      dir: `./flamboyant-${settings.type || "package"}`,
+    },
+    {
+      name: `classy-${settings.type || "package"}`,
+      dir: `./classy-${settings.type || "package"}`,
+    },
+    {
+      name: `flashy-${settings.type || "package"}`,
+      dir: `./flashy-${settings.type || "package"}`,
+    },
+    {
+      name: `posh-${settings.type || "package"}`,
+      dir: `./posh-${settings.type || "package"}`,
+    },
   ]
 
-  const defaultPackageName =
-    invalidProjectNames.includes(defaultPackageNameFromPath) ||
-    defaultPackageNameFromPath.length <= 3 ||
-    !validate(defaultPackageNameFromPath).validForNewPackages
-      ? "my-fancy-package"
-      : defaultPackageNameFromPath
+  const defaultName = defaultNames.find(({ name, dir }) => checkDefaultPackageName(name, settings, dir))
+
+  return defaultName
+}
+
+const selectName = async (settings: PackageSettings) => {
+  const defaultName = recommendNewPackageName(settings)
 
   const result = await prompts(
     {
       type: "text",
       name: "name",
       message: "What is your package named? (only lowercase, numbers and -)",
-      initial: settings.name || defaultPackageName,
+      initial: settings.name || defaultName?.name || undefined,
       validate: name => {
         const validation = validate(path.basename(path.resolve(name)))
         if (validation.validForNewPackages) {
@@ -342,14 +401,15 @@ const selectName = async (settings: PackageSettings) => {
     { onCancel }
   )
 
+  const newPath =
+    normalizeString(path.basename(settings.invokeDirectory)) === normalizeString(result.name)
+      ? "."
+      : normalizeString(result.name)
+
   return addPathInfo({
     ...settings,
     name: result.name as string,
-    path:
-      settings.path ||
-      (normalizeString(path.basename(settings.invokeDirectory)) === normalizeString(result.name)
-        ? "."
-        : normalizeString(result.name)),
+    path: !settings.explicitPath ? newPath : settings.path || newPath,
   })
 }
 
@@ -366,7 +426,8 @@ const selectPath = async (settings: PackageSettings) => {
       name: "path",
       message: "Where should you package be located?",
       initial: settings.path || defaultPath || ".",
-      validate: path => !!path,
+      validate: path =>
+        path ? (checkPath(path) ? true : "That path already contains a node project.") : "You must provide a path.",
     },
     { onCancel }
   )
@@ -375,6 +436,7 @@ const selectPath = async (settings: PackageSettings) => {
     ...settings,
     path: path.normalize(result.path) as string,
     name: settings.name || normalizeString(path.basename(path.normalize(result.path))),
+    explicitPath: true,
   })
 }
 
