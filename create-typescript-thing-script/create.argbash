@@ -97,6 +97,13 @@ if test "$_arg_dry_run" = "on" ; then
     exit 0
 fi
 
+# Ensure that package.json does not already exist
+if test -e package.json
+then
+    echo "package.json already exists" >&2
+    exit 1
+fi
+
 # Make sure we are inside a git repo
 if $GIT_ROOT && ! test -e .git
 then
@@ -117,13 +124,6 @@ fi
 if ! git rev-parse --is-inside-work-tree
 then
     echo "The project has to be inside a nested git repo, if GIT_ROOT is false" >&2
-    exit 1
-fi
-
-# Ensure that package.json does not already exist
-if test -e package.json
-then
-    echo "package.json already exists" >&2
     exit 1
 fi
 
