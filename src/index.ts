@@ -2,6 +2,7 @@ import { blue, red } from "chalk"
 import createTypescriptThingScript from "create-typescript-thing-script"
 import { existsSync } from "fs"
 import fetch from "node-fetch"
+import ora from "ora"
 import { userInfo } from "os"
 import path from "path"
 import { exit } from "process"
@@ -671,7 +672,44 @@ const reviewSettings = async (settings: PackageSettings): Promise<PackageSetting
 
   const s3 = await reviewSettings(s22)
 
-  await createTypescriptThingScript(s3)
+  const projectPromise = createTypescriptThingScript(s3)
+
+  const texts = [
+    `Creating ${blue(s3.name)}`,
+    `${blue(s3.name)} should be ready in a few seconds`,
+    `This should take one minute or less`,
+    `Still creating ${blue(s3.name)}`,
+    `${blue(s3.name)} will be ready at any minute`,
+    `It will only take a few more seconds`,
+    "Nearly done",
+    "Ok, maybe it is going to take a bit logner then I anticipated",
+    `${blue(s3.name)} should be ready soon`,
+    "Maybe your device is just really slow?",
+    "Maybe this script is really inefficient?",
+    "You could star this script while you are waiting https://github.com/Zebreus/create-typescript-thing",
+    "You could star this script while you are waiting https://github.com/Zebreus/create-typescript-thing",
+    "It should be done by now",
+    "Hang in there",
+    `Waiting for ${blue(s3.name)}`,
+  ]
+  const spinner = ora(texts[0]).start()
+
+  let nextText = 0
+
+  const textChange = setInterval(() => {
+    spinner.text = texts[nextText]
+    nextText = (nextText + 1) % texts.length
+  }, 30000)
+
+  try {
+    await projectPromise
+    clearInterval(textChange)
+    spinner.succeed(`Created ${s3.name}`)
+  } catch (error) {
+    clearInterval(textChange)
+    spinner.fail("Failed to create package")
+    console.error(error)
+  }
 })()
 
 export {}
