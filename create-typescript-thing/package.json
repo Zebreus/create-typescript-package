@@ -40,7 +40,7 @@
     "test": "jest",
     "prepack": "ncc build -e create-typescript-thing-script --out dist --minify src/index.ts",
     "prepublish": "eslint --cache && tsc --noEmit",
-    "start": "ncc run src/index.ts"
+    "start": "ncc run -e create-typescript-thing-script src/index.ts"
   },
   "files": [
     "dist/**"
@@ -55,7 +55,7 @@
   },
   "dependencies": {
     "chalk": "4",
-    "create-typescript-thing-script": "^0.3.2",
+    "create-typescript-thing-script": "^0.3.4",
     "node-fetch": "^3.2.9",
     "prompts": "^2.4.2",
     "validate-npm-package-name": "^4.0.0"
