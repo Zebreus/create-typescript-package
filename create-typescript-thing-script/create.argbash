@@ -251,8 +251,8 @@ then
   jqi package.json '.keywords |= (.+ ["executable", "application", "bin"] | unique)'
   jqi package.json '.main = "dist/index.js"'
   jqi package.json ".bin[\"$NAME\"] = \"dist/index.js\""
-  add_script "build" "ncc build --out dist --minify src/index.ts"
-  append_script "prepack" "ncc build --out dist --minify src/index.ts"
+  add_script "build" 'ncc build --out dist --minify src/index.ts && sed '"'"'1s;^;#!/usr/bin/env node\\n;'"'"' dist/index.js -i && chmod a+x dist/index.js'
+  append_script "prepack" 'ncc build --out dist --minify src/index.ts && sed '"'"'1s;^;#!/usr/bin/env node\\n;'"'"' dist/index.js -i && chmod a+x dist/index.js'
   append_script "prepublish" "eslint --cache && tsc --noEmit"
   add_script "start" "ncc run src/index.ts"
   mkdir -p src
