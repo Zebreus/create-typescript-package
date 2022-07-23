@@ -29,5 +29,6 @@
   "eslint.packageManager": "yarn",
   "editor.quickSuggestions": {
     "strings": true
-  }
+  },
+  "typescript.preferences.importModuleSpecifier": "non-relative"
 }
