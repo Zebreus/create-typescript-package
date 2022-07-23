@@ -134,6 +134,7 @@ git commit -m "Add nix shell"
 
 # Initialize project
 yarn init --yes
+test -z "$NAME" || jqi package.json ".name = \"$NAME\""
 test -z "$VERSION" || jqi package.json ".version = \"$VERSION\""
 test -z "$DESCRIPTION" || jqi package.json ".description = \"$DESCRIPTION\""
 jqi package.json "del(.author)"
