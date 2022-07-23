@@ -88,6 +88,24 @@ add_gitignore() {
     add_ignore .gitignore "$1" "$2"
 }
 
+if ! which git
+then
+    echo "git is not installed. Please install git and try again."
+    exit 1
+fi
+
+if ! which jq
+then
+    echo "jq is not installed. Please install jq and try again."
+    exit 1
+fi
+
+if ! which sponge
+then
+    echo "moreutils (for sponge) is not installed. Please install moreutils and try again."
+    exit 1
+fi
+
 mkdir -p $PROJECT_PATH
 cd $PROJECT_PATH
 
