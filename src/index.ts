@@ -1,5 +1,9 @@
+import { getGithubCliCredentials } from "accessGithubCliCredentials"
 import { blue, red } from "chalk"
 import createTypescriptThingScript from "create-typescript-thing-script"
+import { createGithubAccessToken } from "createGithubAccessToken"
+import { createGithubRepo, getUserInfo, getUserRepos } from "createGithubRepo"
+import { findGithubRepo } from "findGithubRepo"
 import { existsSync } from "fs"
 import fetch from "node-fetch"
 import ora from "ora"
@@ -64,6 +68,12 @@ type PackageSettings = {
   gitAccount?: GitAccountInfo
   // True if the path was explicitly set
   explicitPath?: boolean
+  // github username
+  githubUsername?: string
+  // github token
+  githubToken?: string
+  // github protocol
+  gitProtocol?: "https" | "ssh"
 }
 
 const onCancel = () => {
@@ -121,18 +131,25 @@ const addPathInfo = async (settings: PackageSettings): Promise<PackageSettings> 
 }
 
 const addAuthorInfo = async (settings: PackageSettings): Promise<PackageSettings> => {
-  const gitUsername = (await sh("git config --get user.name")).stdout.trim() || undefined
-  const gitEmail = (await sh("git config --get user.email")).stdout.trim() || undefined
+  const gitUsername = (await sh("git config --get user.name").catch(() => ({ stdout: "" }))).stdout.trim() || undefined
+  const gitEmail = (await sh("git config --get user.email").catch(() => ({ stdout: "" }))).stdout.trim() || undefined
   const osUsername = userInfo().username || undefined
+  const credentials = await getGithubCliCredentials()
+  const githubUserinfo = credentials?.accessToken
+    ? await getUserInfo(credentials.accessToken).catch(() => undefined)
+    : undefined
 
   return {
     ...settings,
-    authorName: settings.authorName ?? gitUsername ?? osUsername,
-    authorEmail: settings.authorEmail ?? gitEmail,
+    authorName: settings.authorName ?? githubUserinfo?.name ?? credentials?.user ?? gitUsername ?? osUsername,
+    authorEmail: settings.authorEmail ?? gitEmail, // Not using the github email, as it might be private
 
-    gitUsername: gitUsername,
+    gitUsername: githubUserinfo?.name ?? credentials?.user ?? gitUsername,
     gitEmail: gitEmail,
     osUsername: osUsername,
+    githubUsername: githubUserinfo?.name ?? credentials?.user,
+    githubToken: credentials?.accessToken,
+    gitProtocol: credentials?.protocol ?? "ssh",
   }
 }
 
@@ -149,6 +166,17 @@ const guessGitAccount = async (settings: PackageSettings): Promise<PackageSettin
   const email = settings.gitEmail
   const username = settings.gitUsername
 
+  if (settings.githubUsername) {
+    return {
+      ...settings,
+      gitAccount: {
+        type: "github",
+        username: settings.githubUsername,
+        confidence: settings.githubToken ? 1 : 0.5,
+      },
+    }
+  }
+
   const githubSearchByEmail = (await (await fetch(`https://api.github.com/search/users?q=${email}}`)).json()) as
     | { items: Array<{ login: string }> }
     | undefined
@@ -162,6 +190,8 @@ const guessGitAccount = async (settings: PackageSettings): Promise<PackageSettin
         username: githubEmailUsername,
         confidence: 1,
       },
+      githubUsername: githubEmailUsername,
+      githubToken: githubEmailUsername === settings.githubUsername ? settings.githubToken : undefined,
     }
   }
 
@@ -178,6 +208,8 @@ const guessGitAccount = async (settings: PackageSettings): Promise<PackageSettin
         username: githubUsernameFromUsername,
         confidence: 0.5,
       },
+      githubUsername: githubUsernameFromUsername,
+      githubToken: githubUsernameFromUsername === settings.githubUsername ? settings.githubToken : undefined,
     }
   }
 
@@ -194,6 +226,8 @@ const guessGitAccount = async (settings: PackageSettings): Promise<PackageSettin
         username: gitlabUsernameFromUsername,
         confidence: 0.5,
       },
+      githubUsername: undefined,
+      githubToken: undefined,
     }
   }
 
@@ -206,6 +240,16 @@ const addRepoUrl = async (settings: PackageSettings): Promise<PackageSettings> =
     return {
       ...settings,
       repo: settings.repo ?? pathinfo?.gitOrigin,
+    }
+  }
+
+  if (settings.githubToken && settings.githubUsername && settings.name) {
+    const foundGithubRepo = await findGithubRepo(settings.githubToken, settings.name)
+    if (foundGithubRepo) {
+      return {
+        ...settings,
+        repo: `git@github.com:${foundGithubRepo.fullName}.git`,
+      }
     }
   }
 
@@ -499,6 +543,41 @@ const selectMonorepo = async (settings: PackageSettings) => {
   }
 }
 
+const selectGithubAccount = async (settings: PackageSettings): Promise<PackageSettings> => {
+  const result = await prompts(
+    {
+      type: "confirm",
+      name: "login",
+      message: "You can now sign into github. This way I can detect a repository for this package or create a new one.",
+      initial: true,
+    },
+    { onCancel }
+  )
+
+  if (!result.login) {
+    return settings
+  }
+
+  const validRepoUrl = settings.repo ? validateGitRepo(settings.repo) : false
+
+  const accessToken = await createGithubAccessToken()
+  await getUserRepos(accessToken)
+  const userInfo = await getUserInfo(accessToken)
+
+  const newSettings: PackageSettings = {
+    ...settings,
+    gitAccount: {
+      type: "github",
+      username: userInfo.name,
+      confidence: 1,
+    },
+    githubToken: accessToken,
+    githubUsername: userInfo.name,
+  }
+
+  return (await validRepoUrl) ? newSettings : await addRepoUrl(newSettings)
+}
+
 const selectOrigin = async (settings: PackageSettings) => {
   const defaultRepoUrl =
     settings.gitAccount && settings.name
@@ -518,6 +597,25 @@ const selectOrigin = async (settings: PackageSettings) => {
     },
     { onCancel }
   )
+
+  const repoExists = result.repo && (await validateGitRepo(result.repo))
+  const parsedRepoName = result.repo.split(":")[1].replace(".git", "").split("/")[1]
+  const githubUrl = buildGitRepoUrl("github", settings.githubUsername || "", parsedRepoName)
+
+  if (!repoExists && settings.githubToken && githubUrl === result.repo) {
+    const result = await prompts(
+      {
+        type: "confirm",
+        name: "create",
+        message: `Do you want to create the repo on github? (You are signed in as ${settings.githubUsername})`,
+        initial: true,
+      },
+      { onCancel }
+    )
+    if (result.create) {
+      await createGithubRepo(settings.githubToken, parsedRepoName, settings.description || "")
+    }
+  }
 
   return {
     ...settings,
@@ -678,13 +776,17 @@ const reviewSettings = async (settings: PackageSettings): Promise<PackageSetting
 
   const s2 = await selectName(s11)
 
+  const s200 = await selectDescription(s2)
+
   const pathInfo = getPathInfo(s2)
 
   if (!pathInfo) {
     throw new Error("Handle this somehow")
   }
 
-  const s21 = await addRepoUrl(s2)
+  const s20 = s200.githubToken ? s200 : await selectGithubAccount(s200)
+
+  const s21 = await addRepoUrl(s20)
 
   const s22 = s21.repo ? s21 : await selectOrigin(s21)
 
