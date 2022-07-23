@@ -63,6 +63,6 @@
     "create-typescript-thing": "dist/index.js"
   },
   "dependencies": {
-    "create-typescript-thing-script": "^0.3.6"
+    "create-typescript-thing-script": "^0.3.7"
   }
 }
