@@ -5,20 +5,23 @@
     "lib": ["es2016", "esnext"],
     "jsx": "preserve",
     "module": "commonjs",
-    "rootDir": "src",
-    "baseUrl": "./src/",
     "allowJs": true,
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "outDir": "./dist",
+    "outDir": "dist",
     "noEmit": true,
     "isolatedModules": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "rootDir": "src",
+    "baseUrl": ".",
+    "paths": {
+      "*": ["./src/*"]
+    }
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*"]
 }

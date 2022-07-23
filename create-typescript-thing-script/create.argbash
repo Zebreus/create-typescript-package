@@ -168,6 +168,7 @@ git commit -m "Initialize node project"
 # Add typescript
 yarn add --dev typescript@latest @types/node@latest
 cp_resource_file tsconfig.json .
+cp_resource_file tsconfig.build.json .
 mkdir -p src
 add_gitignore dist/ typescript
 add_gitignore '*.tsbuildinfo' typescript
@@ -231,7 +232,7 @@ git commit -m "Add vscode extensions and settings"
 # Configure library project
 if test "$TYPE" = "library"
 then
-  yarn add --dev @vercel/ncc@latest
+  yarn add --dev resolve-tspaths@latest
   jqi package.json '.files |= (.+ ["dist/**"] | unique)'
   jqi package.json '.keywords |= (.+ ["library"] | unique)'
   jqi package.json '.main = "dist/index.js"'
