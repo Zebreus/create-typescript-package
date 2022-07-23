@@ -1,9 +1,8 @@
 {
   "compilerOptions": {
     "incremental": true,
-    "target": "es2016",
-    "lib": ["es2016", "esnext"],
-    "jsx": "preserve",
+    "target": "esnext",
+    "lib": ["es6", "esnext"],
     "module": "commonjs",
     "rootDir": "src",
     "baseUrl": "./src/",
@@ -11,7 +10,7 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "outDir": "./dist",
+    "outDir": "dist",
     "noEmit": true,
     "isolatedModules": true,
     "allowSyntheticDefaultImports": true,
@@ -20,5 +19,5 @@
     "strict": true,
     "skipLibCheck": true
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src"]
 }
