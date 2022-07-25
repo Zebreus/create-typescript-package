@@ -3,6 +3,8 @@
   "compilerOptions": {
     "incremental": false,
     "noEmit": false,
+    "sourceMap": false,
+    "declarationMap": false
   },
   "exclude": ["src/**/*.test.ts"]
 }
