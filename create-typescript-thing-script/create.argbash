@@ -213,7 +213,6 @@ yarn add --dev jest@latest @types/jest@latest ts-jest@latest ts-node@latest esli
 cp_resource_file jest.config.js .
 mkdir -p src/tests
 cp_resource_file example.test.ts src/tests/example.test.ts
-jqi tsconfig.json '.exclude |= (.+ ["src/tests"] | unique)'
 jqi .eslintrc.json '.extends |= (.+ ["plugin:jest/recommended"] | unique)'
 jqi .eslintrc.json '.rules["jest/expect-expect"] = "off"'
 add_script "test" "jest"
