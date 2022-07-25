@@ -254,7 +254,7 @@ then
   jqi package.json '.keywords |= (.+ ["library"] | unique)'
   jqi package.json '.main = "dist/index.js"'
   append_script "build" "tsc --project tsconfig.build.json && resolve-tspaths -p tsconfig.build.json"
-  append_script "prepack" "tsc --project tsconfig.build.json && resolve-tspaths -p tsconfig.build.json"
+  append_script "prepack" "rm -rf dist && tsc --project tsconfig.build.json && resolve-tspaths -p tsconfig.build.json"
   append_script "prepublish" "eslint --cache && tsc --noEmit"
   mkdir -p src
   cp_resource_file libraryIndex.ts src/index.ts
@@ -271,7 +271,7 @@ then
   jqi package.json '.main = "dist/index.js"'
   jqi package.json ".bin[\"$NAME\"] = \"dist/index.js\""
   append_script "build" 'ncc build --out dist --minify src/index.ts && sed '"'"'1s;^;#!/usr/bin/env node\\n;'"'"' dist/index.js -i && chmod a+x dist/index.js'
-  append_script "prepack" 'ncc build --out dist --minify src/index.ts && sed '"'"'1s;^;#!/usr/bin/env node\\n;'"'"' dist/index.js -i && chmod a+x dist/index.js'
+  append_script "prepack" 'rm -rf dist && ncc build --out dist --minify src/index.ts && sed '"'"'1s;^;#!/usr/bin/env node\\n;'"'"' dist/index.js -i && chmod a+x dist/index.js'
   append_script "prepublish" "eslint --cache && tsc --noEmit"
   add_script "start" "ncc run src/index.ts"
   mkdir -p src
