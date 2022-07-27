@@ -487,12 +487,12 @@ const selectPath = async (settings: PackageSettings) => {
   })
 }
 
-const selectDescription = async (settings: PackageSettings) => {
+const selectDescription = async (settings: PackageSettings, prompt: string = "Can you tell me a short description of your package?") => {
   const result = await prompts(
     {
       type: "text",
       name: "description",
-      message: "Can you tell me a short description of your package? (Leave empty to skip)",
+      message: `${prompt} (Leave empty to skip)`,
       initial: settings.description || "",
       validate: description =>
         description.length === 0
@@ -616,7 +616,8 @@ const selectOrigin = async (settings: PackageSettings) => {
       { onCancel }
     )
     if (result.create) {
-      await createGithubRepo(settings.githubToken, parsedRepoName, settings.description || "")
+      const settingsWithDescription = settings.description ? settings : await selectDescription(settings, "You should add a short description before creating a repo.")
+      await createGithubRepo(settingsWithDescription.githubToken || "", parsedRepoName, settings.description || "")
     }
   }
 
