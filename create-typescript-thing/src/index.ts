@@ -535,12 +535,15 @@ const selectMonorepo = async (settings: PackageSettings) => {
 
   const wasMonorepo =
     !result.monorepo && pathInfo.firstExistingPathUp !== pathInfo.absolutePath && pathInfo.gitOrigin === parsedOrigin
-
-  return {
+    
+  const newSettings = {
     ...settings,
     monorepo: result.monorepo as boolean,
     repo: result.monorepo && parsedOrigin && !settings.repo ? parsedOrigin : wasMonorepo ? undefined : settings.repo,
   }
+
+  // Ask to select git repo if the repo got unset
+  return (newSettings.repo === undefined && settings.repo !== undefined) ? await selectOrigin(newSettings) : newSettings
 }
 
 const selectGithubAccount = async (settings: PackageSettings): Promise<PackageSettings> => {
