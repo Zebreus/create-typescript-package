@@ -1,6 +1,6 @@
 {
   "name": "create-typescript-thing-script",
-  "version": "0.3.7",
+  "version": "0.3.8",
   "main": "index.js",
   "license": "MIT",
   "description": "Description text",
