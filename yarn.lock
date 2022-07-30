@@ -1333,10 +1333,10 @@ create-require@^1.1.0:
   resolved "https://registry.yarnpkg.com/create-require/-/create-require-1.1.1.tgz#c1d7e8f1e5f6cfc9ff65f9cd352d37348756c333"
   integrity sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==
 
-create-typescript-thing-script@^0.3.7:
-  version "0.3.7"
-  resolved "https://registry.yarnpkg.com/create-typescript-thing-script/-/create-typescript-thing-script-0.3.7.tgz#2c7b76f2cb685a692e9be3de4ebe4b3b1490aa93"
-  integrity sha512-N0VytX7/5z1vwxtdh9Bh9VWIs9C39QmRhRovaKOMOMSAlVzqx4hfdSrqK36nsO20Wy31b6WEWOHRSpxpMMzhUg==
+create-typescript-thing-script@^0.3.8:
+  version "0.3.8"
+  resolved "https://registry.yarnpkg.com/create-typescript-thing-script/-/create-typescript-thing-script-0.3.8.tgz#0a0976ebf42a100969849b686ac231f6b6f2ba07"
+  integrity sha512-NDVIlp0DbAvfwsqgCBgIJj+zhEqHVjM01tL1BRHT1tnraoTW70wJjKYwrwk1a2TZo9Hal5eDUCMvls7iNr7bQQ==
 
 cross-spawn@^7.0.2, cross-spawn@^7.0.3:
   version "7.0.3"
