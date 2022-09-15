@@ -12,6 +12,11 @@ cd your-new-project
 yarn start
 ```
 
+<p align='center'>
+
+<img src='https://raw.githubusercontent.com/Zebreus/create-typescript-thing/master/screencast.svg' width='750' alt='create-typescript-thing' />
+</p>
+
 # Philosophy
 
 - __No magic single dependency:__ Create typescript thing just creates config files for you. After creating your project you will not have to use create-typescript-thing again.
