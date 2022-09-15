@@ -106,6 +106,19 @@ export const createGithubRepo = async (accessToken: string, name: string, descri
   if (response.status !== 201) {
     throw new Error("Failed to create repo")
   }
+
   delete reposByName[userInfo.name]
   await getUserRepos(accessToken)
+}
+
+export const getDefaultBranch = async (accessToken: string, repoName: string) => {
+  const userInfo = await getUserInfo(accessToken)
+  const response = await fetch(`https://api.github.com/repos/${userInfo.name}/${repoName}`, {
+    headers: { Authorization: `token ${accessToken}`, Accept: "application/vnd.github+json" },
+  })
+  const jsonResponse = (await response.json()) as undefined | { default_branch?: string }
+  if (!jsonResponse || !jsonResponse.default_branch) {
+    throw new Error("Failed to get default branch")
+  }
+  return jsonResponse.default_branch
 }
