@@ -677,7 +677,6 @@ const selectPackageManager = async (settings: PackageSettings) => {
         },
         { title: "Yarn", value: "yarn", description: "The yarn package manager. I think yarn classic" },
       ],
-      initial: settings.packageManager || "npm",
     },
     { onCancel }
   )
