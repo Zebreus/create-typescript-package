@@ -24,6 +24,7 @@
     "@vercel/ncc": "^0.34.0",
     "chalk": "4",
     "clipboardy": "^3.0.0",
+    "create-typescript-thing-lib": "^0.0.3",
     "eslint": "^8.20.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-jest": "^26.6.0",
@@ -43,13 +44,13 @@
     "yaml": "^2.1.1"
   },
   "scripts": {
-    "build": "ncc build -e create-typescript-thing-script --out dist src/index.ts && sed '1s;^;#!/usr/bin/env node\\n;' dist/index.js -i && chmod a+x dist/index.js",
+    "build": "ncc build -e create-typescript-thing-script --out dist src/index.ts --external='@npmcli/run-script' && sed '1s;^;#!/usr/bin/env node\\n;' dist/index.js -i && chmod a+x dist/index.js",
     "format": "prettier .",
     "lint": "eslint --cache && tsc --noEmit",
     "test": "jest",
     "prepack": "ncc build -e create-typescript-thing-script --out dist --minify src/index.ts && sed '1s;^;#!/usr/bin/env node\\n;' dist/index.js -i && chmod a+x dist/index.js",
     "prepublish": "eslint --cache && tsc --noEmit",
-    "start": "ncc run -e create-typescript-thing-script src/index.ts"
+    "start": "ncc run -e create-typescript-thing-script src/index.ts --external='@npmcli/run-script' --external='prettier-plugin-organize-imports'"
   },
   "files": [
     "dist/index.js"
@@ -61,8 +62,5 @@
   ],
   "bin": {
     "create-typescript-thing": "dist/index.js"
-  },
-  "dependencies": {
-    "create-typescript-thing-script": "^0.3.8"
   }
 }

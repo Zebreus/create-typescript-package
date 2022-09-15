@@ -1,8 +1,8 @@
 import { getGithubCliCredentials } from "accessGithubCliCredentials"
 import { blue, red } from "chalk"
-import createTypescriptThingScript from "create-typescript-thing-script"
+import { createTypescriptThing, Options } from "create-typescript-thing-lib"
 import { createGithubAccessToken } from "createGithubAccessToken"
-import { createGithubRepo, getUserInfo, getUserRepos } from "createGithubRepo"
+import { createGithubRepo, getDefaultBranch, getUserInfo, getUserRepos } from "createGithubRepo"
 import { findGithubRepo } from "findGithubRepo"
 import { existsSync } from "fs"
 import fetch from "node-fetch"
@@ -236,10 +236,18 @@ const guessGitAccount = async (settings: PackageSettings): Promise<PackageSettin
 
 const addRepoUrl = async (settings: PackageSettings): Promise<PackageSettings> => {
   const pathinfo = getPathInfo(settings)
+
+  const defaultBranch =
+    settings.branch ||
+    (settings.gitAccount?.type === "github" && settings.githubToken && settings.name
+      ? await getDefaultBranch(settings.githubToken, settings.name)
+      : undefined)
+
   if (pathinfo?.gitOrigin) {
     return {
       ...settings,
       repo: settings.repo ?? pathinfo?.gitOrigin,
+      branch: defaultBranch,
     }
   }
 
@@ -249,12 +257,16 @@ const addRepoUrl = async (settings: PackageSettings): Promise<PackageSettings> =
       return {
         ...settings,
         repo: `git@github.com:${foundGithubRepo.fullName}.git`,
+        branch: defaultBranch,
       }
     }
   }
 
   if (settings.repo || !settings.gitAccount || !settings.name) {
-    return settings
+    return {
+      ...settings,
+      branch: defaultBranch,
+    }
   }
 
   const repoUrl = buildGitRepoUrl(settings.gitAccount.type, settings.gitAccount.username, settings.name)
@@ -266,6 +278,7 @@ const addRepoUrl = async (settings: PackageSettings): Promise<PackageSettings> =
   return {
     ...settings,
     repo: repoUrl,
+    branch: defaultBranch,
   }
 }
 
@@ -487,7 +500,10 @@ const selectPath = async (settings: PackageSettings) => {
   })
 }
 
-const selectDescription = async (settings: PackageSettings, prompt: string = "Can you tell me a short description of your package?") => {
+const selectDescription = async (
+  settings: PackageSettings,
+  prompt = "Can you tell me a short description of your package?"
+) => {
   const result = await prompts(
     {
       type: "text",
@@ -535,15 +551,18 @@ const selectMonorepo = async (settings: PackageSettings) => {
 
   const wasMonorepo =
     !result.monorepo && pathInfo.firstExistingPathUp !== pathInfo.absolutePath && pathInfo.gitOrigin === parsedOrigin
-    
+
+  const newRepo =
+    result.monorepo && parsedOrigin && !settings.repo ? parsedOrigin : wasMonorepo ? undefined : settings.repo
+
   const newSettings = {
     ...settings,
     monorepo: result.monorepo as boolean,
-    repo: result.monorepo && parsedOrigin && !settings.repo ? parsedOrigin : wasMonorepo ? undefined : settings.repo,
+    repo: newRepo,
   }
 
   // Ask to select git repo if the repo got unset
-  return (newSettings.repo === undefined && settings.repo !== undefined) ? await selectOrigin(newSettings) : newSettings
+  return newSettings.repo === undefined && settings.repo !== undefined ? await selectOrigin(newSettings) : newSettings
 }
 
 const selectGithubAccount = async (settings: PackageSettings): Promise<PackageSettings> => {
@@ -602,7 +621,7 @@ const selectOrigin = async (settings: PackageSettings) => {
   )
 
   const repoExists = result.repo && (await validateGitRepo(result.repo))
-  const parsedRepoName = result.repo.split(":")[1].replace(".git", "").split("/")[1]
+  const parsedRepoName = result.repo?.split(":")?.[1]?.replace(".git", "").split("/")[1]
   const githubUrl = buildGitRepoUrl("github", settings.githubUsername || "", parsedRepoName)
 
   if (!repoExists && settings.githubToken && githubUrl === result.repo) {
@@ -616,14 +635,23 @@ const selectOrigin = async (settings: PackageSettings) => {
       { onCancel }
     )
     if (result.create) {
-      const settingsWithDescription = settings.description ? settings : await selectDescription(settings, "You should add a short description before creating a repo.")
+      const settingsWithDescription = settings.description
+        ? settings
+        : await selectDescription(settings, "You should add a short description before creating a repo.")
       await createGithubRepo(settingsWithDescription.githubToken || "", parsedRepoName, settings.description || "")
     }
   }
 
+  const defaultBranch =
+    settings.branch ||
+    (parsedRepoName && settings.githubToken && githubUrl === result.repo
+      ? await getDefaultBranch(settings.githubToken, parsedRepoName)
+      : undefined)
+
   return {
     ...settings,
     repo: (result.repo || undefined) as string | undefined,
+    branch: defaultBranch,
   }
 }
 
@@ -798,44 +826,118 @@ const reviewSettings = async (settings: PackageSettings): Promise<PackageSetting
 
   const s3 = await reviewSettings(s22)
 
-  const projectPromise = createTypescriptThingScript(s3)
-
-  const texts = [
-    `Creating ${blue(s3.name)}`,
-    `${blue(s3.name)} should be ready in a few seconds`,
-    `This should take one minute or less`,
-    `Still creating ${blue(s3.name)}`,
-    `${blue(s3.name)} will be ready at any minute`,
-    `It will only take a few more seconds`,
-    "Nearly done",
-    "Ok, maybe it is going to take a bit logner then I anticipated",
-    `${blue(s3.name)} should be ready soon`,
-    "Maybe your device is just really slow?",
-    "Maybe this script is really inefficient?",
-    "You could star this script while you are waiting https://github.com/Zebreus/create-typescript-thing",
-    "You could star this script while you are waiting https://github.com/Zebreus/create-typescript-thing",
-    "It should be done by now",
-    "Hang in there",
-    `Waiting for ${blue(s3.name)}`,
-  ]
-  const spinner = ora(texts[0]).start()
-
-  let nextText = 0
-
-  const textChange = setInterval(() => {
-    spinner.text = texts[nextText]
-    nextText = (nextText + 1) % texts.length
-  }, 20000)
-
-  try {
-    await projectPromise
-    clearInterval(textChange)
-    spinner.succeed(`Created ${s3.name}`)
-  } catch (error) {
-    clearInterval(textChange)
-    spinner.fail("Failed to create package")
-    console.error(error)
+  const nameChecked = s3.name
+  if (!nameChecked) {
+    throw new Error("Name is not set")
   }
+
+  const spinner2 = ora("Creating package").start()
+
+  const ctsOptions: Options = {
+    path: s3.path || ".",
+    name: nameChecked,
+    description: s3.description,
+    type: s3.type || "library",
+    authorName: s3.authorName,
+    authorEmail: s3.authorEmail,
+    packageManager: "pnpm",
+    disableGitCommits: false,
+    disableGitRepo: s3.monorepo,
+    gitOrigin: s3.repo,
+    gitBranch: s3.branch,
+
+    logger: {
+      logMessage: (message, { type }) => {
+        const oldMessage = spinner2.text
+        const spinning = spinner2.isSpinning
+        switch (type) {
+          case undefined:
+          case "info":
+            spinner2.info(message)
+            break
+          case "error":
+            spinner2.fail(message)
+            break
+          case "success":
+            spinner2.succeed(message)
+            break
+          case "warning":
+            spinner2.warn(message)
+            break
+        }
+
+        if (spinning) {
+          spinner2.start(oldMessage)
+        }
+      },
+      logState: (id, { text, state }) => {
+        switch (state) {
+          case undefined:
+            if (text !== undefined) {
+              spinner2.text = text
+            }
+            break
+          case "active":
+            spinner2.start(text)
+            break
+          case "completed":
+            spinner2.succeed(text)
+            break
+          case "failed":
+            spinner2.fail(text)
+            break
+          case "pending":
+            spinner2.info(text)
+            break
+        }
+      },
+    },
+  }
+
+  console.log(ctsOptions)
+
+  await createTypescriptThing(ctsOptions)
+  if (spinner2.isSpinning) {
+    spinner2.succeed(`Created ${s3.name}`)
+  }
+  // const projectPromise = createTypescriptThing(ctsOptions)
+
+  // const texts = [
+  //   `Creating ${blue(s3.name)}`,
+  //   `${blue(s3.name)} should be ready in a few seconds`,
+  //   `This should take one minute or less`,
+  //   `Still creating ${blue(s3.name)}`,
+  //   `${blue(s3.name)} will be ready at any minute`,
+  //   `It will only take a few more seconds`,
+  //   "Nearly done",
+  //   "Ok, maybe it is going to take a bit logner then I anticipated",
+  //   `${blue(s3.name)} should be ready soon`,
+  //   "Maybe your device is just really slow?",
+  //   "Maybe this script is really inefficient?",
+  //   "You could star this script while you are waiting https://github.com/Zebreus/create-typescript-thing",
+  //   "You could star this script while you are waiting https://github.com/Zebreus/create-typescript-thing",
+  //   "It should be done by now",
+  //   "Hang in there",
+  //   `Waiting for ${blue(s3.name)}`,
+  // ]
+  // const spinner = ora(texts[0]).start()
+
+  // let nextText = 0
+
+  // const textChange = setInterval(() => {
+  //   spinner.text = texts[nextText]
+  //   nextText = (nextText + 1) % texts.length
+  // }, 20000)
+
+  // try {
+  //   await projectPromise
+  //   clearInterval(textChange)
+  //   spinner.succeed(`Created ${s3.name}`
+  // } catch (error) {
+  //   clearInterval(textChange)
+  //   spinner.fail("Failed to create package")
+  //   console.error(error)
+  // }
 })()
 
 export {}
