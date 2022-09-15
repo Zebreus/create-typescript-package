@@ -850,8 +850,6 @@ const reviewSettings = async (settings: PackageSettings): Promise<PackageSetting
 
   const s11 = { ...initialSettings[0], type: initialSettings[1].type, ...initialSettings[2] }
 
-  console.log(s11)
-
   const s2 = await selectName(s11)
 
   const s200 = await selectDescription(s2)
