@@ -1,6 +1,6 @@
 {
   "name": "create-typescript-thing",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "main": "dist/index.js",
   "license": "MIT",
   "author": {
@@ -48,7 +48,7 @@
     "format": "prettier .",
     "lint": "eslint --cache && tsc --noEmit",
     "test": "jest",
-    "prepack": "ncc build -e create-typescript-thing-script --out dist --minify src/index.ts && sed '1s;^;#!/usr/bin/env node\\n;' dist/index.js -i && chmod a+x dist/index.js",
+    "prepack": "ncc build -e create-typescript-thing-script --out dist --minify src/index.ts --external='@npmcli/run-script' && sed '1s;^;#!/usr/bin/env node\\n;' dist/index.js -i && chmod a+x dist/index.js",
     "prepublish": "eslint --cache && tsc --noEmit",
     "start": "ncc run -e create-typescript-thing-script src/index.ts --external='@npmcli/run-script' --external='prettier-plugin-organize-imports'"
   },
@@ -62,5 +62,8 @@
   ],
   "bin": {
     "create-typescript-thing": "dist/index.js"
+  },
+  "dependencies": {
+    "@npmcli/run-script": "^4.1.3"
   }
 }
