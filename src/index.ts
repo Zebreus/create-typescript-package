@@ -3,6 +3,7 @@ import { blue, red } from "chalk"
 import { createTypescriptThing, Options } from "create-typescript-thing-lib"
 import { createGithubAccessToken } from "createGithubAccessToken"
 import { createGithubRepo, getDefaultBranch, getUserInfo, getUserRepos } from "createGithubRepo"
+import { determinePackageManager } from "determinePackageManager"
 import { findGithubRepo } from "findGithubRepo"
 import { existsSync } from "fs"
 import fetch from "node-fetch"
@@ -74,6 +75,8 @@ type PackageSettings = {
   githubToken?: string
   // github protocol
   gitProtocol?: "https" | "ssh"
+
+  packageManager?: "pnpm" | "yarn" | "npm"
 }
 
 const onCancel = () => {
@@ -655,6 +658,36 @@ const selectOrigin = async (settings: PackageSettings) => {
   }
 }
 
+const selectPackageManager = async (settings: PackageSettings) => {
+  const result = await prompts(
+    {
+      type: "select",
+      name: "packageManager",
+      message: "What package manager do you use?",
+      choices: [
+        {
+          title: "Npm",
+          value: "npm",
+          description: "The package manager that comes with node",
+        },
+        {
+          title: "pNpm",
+          value: "pnpm",
+          description: "Fast, disk space efficient package manager",
+        },
+        { title: "Yarn", value: "yarn", description: "The yarn package manager. I think yarn classic" },
+      ],
+      initial: settings.packageManager || "npm",
+    },
+    { onCancel }
+  )
+
+  return {
+    ...settings,
+    packageManager: result.packageManager as PackageSettings["packageManager"],
+  }
+}
+
 const awaitWithTimeout = async <T>(promise: Promise<T>, timeout: number, defaultValue: T): Promise<T> => {
   const timeoutPromise = new Promise<T>((resolve, reject) => {
     setTimeout(() => {
@@ -753,6 +786,11 @@ const reviewSettings = async (settings: PackageSettings): Promise<PackageSetting
           description: "Set to true if your project is not in the root of a git repo",
           value: "monorepo",
         },
+        {
+          title: settings.packageManager ? `Lockfiles    : ${settings.packageManager}` : `Select your package manager`,
+          description: "Select which package manager you are going to use",
+          value: "packageManager",
+        },
       ],
       initial: 0,
     },
@@ -783,27 +821,37 @@ const reviewSettings = async (settings: PackageSettings): Promise<PackageSetting
       return reviewSettings(await selectOrigin(settings))
     case "monorepo":
       return reviewSettings(await selectMonorepo(settings))
+    case "packageManager":
+      return reviewSettings(await selectPackageManager(settings))
     default:
       throw new Error("Unexpected selection")
   }
 }
 
 ;(async () => {
-  const initialSettings = addAuthorInfo({
+  const authorSettings = addAuthorInfo({
     type: "library",
     invokeDirectory: path.normalize(process.cwd()),
     pathInfos: {},
   } as PackageSettings).then(settings => guessGitAccount(settings))
 
+  const packageManagerSettings = determinePackageManager().then(packageManager => ({
+    packageManager,
+  }))
+
   //TODO: Determine author name
 
-  const s1 = await selectType({
+  const s1 = selectType({
     type: "library",
     invokeDirectory: path.normalize(process.cwd()),
     pathInfos: {},
   })
 
-  const s11 = { ...(await initialSettings), type: s1.type }
+  const initialSettings = await Promise.all([authorSettings, s1, packageManagerSettings])
+
+  const s11 = { ...initialSettings[0], type: initialSettings[1].type, ...initialSettings[2] }
+
+  console.log(s11)
 
   const s2 = await selectName(s11)
 
@@ -839,7 +887,7 @@ const reviewSettings = async (settings: PackageSettings): Promise<PackageSetting
     type: s3.type || "library",
     authorName: s3.authorName,
     authorEmail: s3.authorEmail,
-    packageManager: "pnpm",
+    packageManager: s3.packageManager,
     disableGitCommits: false,
     disableGitRepo: s3.monorepo,
     gitOrigin: s3.repo,
