@@ -291,7 +291,7 @@ const selectAuthorName = async (settings: PackageSettings) => {
     {
       type: "text",
       name: "authorName",
-      message: "What is your name? (Leave empty to skip)",
+      message: "What is your name?",
       initial: settings.authorName || "",
     },
     { onCancel }
@@ -308,7 +308,7 @@ const selectAuthorEmail = async (settings: PackageSettings) => {
     {
       type: "text",
       name: "authorEmail",
-      message: "What is your name? (Leave empty to skip)",
+      message: "What is your email?",
       initial: settings.authorEmail || "",
     },
     { onCancel }
@@ -325,13 +325,13 @@ const selectType = async (settings: PackageSettings) => {
     {
       type: "select",
       name: "type",
-      message: "What type of package do you want to create today?",
+      message: "What do you want to create today?",
       choices: [
-        { title: "A library", value: "library", description: "A library that can be published to npm" },
+        { title: "A library", value: "library", description: "A javascript library" },
         {
           title: "An application",
           value: "application",
-          description: "An cli application that can be published to npm",
+          description: "A interactive cli application",
         },
         {
           title: "A web3 blockchain project with NFTs",
@@ -445,7 +445,7 @@ const selectName = async (settings: PackageSettings) => {
     {
       type: "text",
       name: "name",
-      message: "What is your package named? (only lowercase, numbers and -)",
+      message: "What is your package named?",
       initial: settings.name || defaultName?.name || undefined,
       validate: name => {
         const validation = validate(path.basename(path.resolve(name)))
@@ -484,7 +484,7 @@ const selectPath = async (settings: PackageSettings) => {
     {
       type: "text",
       name: "path",
-      message: "Where should you package be located?",
+      message: "Where should your package be located?",
       initial: settings.path || defaultPath || ".",
       validate: path =>
         path ? (checkPath(path) ? true : "That path already contains a node project.") : "You must provide a path.",
@@ -502,13 +502,13 @@ const selectPath = async (settings: PackageSettings) => {
 
 const selectDescription = async (
   settings: PackageSettings,
-  prompt = "Can you tell me a short description of your package?"
+  prompt = "Give me a short description of your package:"
 ) => {
   const result = await prompts(
     {
       type: "text",
       name: "description",
-      message: `${prompt} (Leave empty to skip)`,
+      message: prompt,
       initial: settings.description || "",
       validate: description =>
         description.length === 0
@@ -570,7 +570,7 @@ const selectGithubAccount = async (settings: PackageSettings): Promise<PackageSe
     {
       type: "confirm",
       name: "login",
-      message: "You can now sign into github. This way I can detect a repository for this package or create a new one.",
+      message: "Please sign into github so I can find or create a repository for this package.",
       initial: true,
     },
     { onCancel }
@@ -610,7 +610,7 @@ const selectOrigin = async (settings: PackageSettings) => {
     {
       type: "text",
       name: "repo",
-      message: "Do you already have a git repository? (Leave empty to skip)",
+      message: "Do you already have a git repository?",
       initial: settings.repo || defaultRepoUrl,
       validate: repo =>
         repo.startsWith("http") || repo.startsWith("git@") || repo.startsWith("ssh") || repo === ""
@@ -629,7 +629,7 @@ const selectOrigin = async (settings: PackageSettings) => {
       {
         type: "confirm",
         name: "create",
-        message: `Do you want to create the repo on github? (You are signed in as ${settings.githubUsername})`,
+        message: `Do you want to create the repo on github? (Signed in as ${settings.githubUsername})`,
         initial: true,
       },
       { onCancel }
@@ -637,7 +637,7 @@ const selectOrigin = async (settings: PackageSettings) => {
     if (result.create) {
       const settingsWithDescription = settings.description
         ? settings
-        : await selectDescription(settings, "You should add a short description before creating a repo.")
+        : await selectDescription(settings, "You should add a short description.")
       await createGithubRepo(settingsWithDescription.githubToken || "", parsedRepoName, settings.description || "")
     }
   }
@@ -722,7 +722,7 @@ const reviewSettings = async (settings: PackageSettings): Promise<PackageSetting
           description: "Change the description",
           value: "description",
         },
-        { title: `Type         : ${settings.type}`, description: "Change the type", value: "type" },
+        { title: `Type         : ${settings.type}`, description: "Change what what your packages is", value: "type" },
         {
           title: settings.name ? `Name         : ${settings.name}` : `Set the package name`,
           description: "Change the package name",
@@ -750,8 +750,7 @@ const reviewSettings = async (settings: PackageSettings): Promise<PackageSetting
         },
         {
           title: settings.monorepo ? `In monorepo  : yes` : `In monorepo  : no`,
-          description:
-            "Change whether your package is part of a monorepo. This affects wheter a pre-commit hook is set up",
+          description: "Set to true if your project is not in the root of a git repo",
           value: "monorepo",
         },
       ],
