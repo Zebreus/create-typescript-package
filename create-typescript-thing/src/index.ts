@@ -894,8 +894,6 @@ const reviewSettings = async (settings: PackageSettings): Promise<PackageSetting
     },
   }
 
-  console.log(ctsOptions)
-
   await createTypescriptThing(ctsOptions)
   if (spinner2.isSpinning) {
     spinner2.succeed(`Created ${s3.name}`)
