@@ -116,9 +116,9 @@ export const getDefaultBranch = async (accessToken: string, repoName: string) =>
   const response = await fetch(`https://api.github.com/repos/${userInfo.name}/${repoName}`, {
     headers: { Authorization: `token ${accessToken}`, Accept: "application/vnd.github+json" },
   })
-  const jsonResponse = (await response.json()) as undefined | { default_branch?: string }
+  const jsonResponse = (await response.json().catch(() => undefined)) as undefined | { default_branch?: string }
   if (!jsonResponse || !jsonResponse.default_branch) {
-    throw new Error("Failed to get default branch")
+    return undefined
   }
   return jsonResponse.default_branch
 }
