@@ -1,11 +1,9 @@
 {
   "compilerOptions": {
-    "incremental": true,
     "target": "esnext",
-    "lib": ["es6", "esnext"],
-    "module": "commonjs",
-    "rootDir": "src",
-    "baseUrl": "./src/",
+    "lib": ["esnext"],
+    "module": "ES2015",
+    "moduleResolution": "node",
     "allowJs": true,
     "declaration": true,
     "declarationMap": true,
@@ -17,7 +15,12 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "rootDir": "src",
+    "baseUrl": ".",
+    "paths": {
+      "*": ["./src/*"]
+    },
   },
-  "include": ["src"]
+  "include": ["src/**/*"]
 }

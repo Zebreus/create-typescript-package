@@ -1,5 +1,6 @@
 {
   "name": "create-typescript-thing",
+  "type": "module",
   "version": "0.3.5",
   "main": "dist/index.js",
   "license": "MIT",
@@ -23,39 +24,31 @@
     "@typescript-eslint/eslint-plugin": "^5.30.7",
     "@typescript-eslint/parser": "^5.30.7",
     "@vercel/ncc": "^0.34.0",
-    "chalk": "4",
-    "clipboardy": "^3.0.0",
-    "create-typescript-thing-lib": "^0.0.3",
+    "@zebreus/resolve-tspaths": "^0.8.4",
     "eslint": "^8.20.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-jest": "^26.6.0",
     "jest": "^28.1.3",
     "lint-staged": "^13.0.3",
-    "node-fetch": "2",
-    "open": "^8.4.0",
-    "ora": "^6.1.2",
     "prettier": "^2.7.1",
     "prettier-plugin-organize-imports": "^3.0.0",
-    "prompts": "^2.4.2",
     "ts-jest": "^28.0.7",
     "ts-node": "^10.9.1",
     "tsc-files": "^1.1.3",
     "typescript": "^4.7.4",
-    "validate-npm-package-name": "^4.0.0",
-    "which": "^2.0.2",
     "yaml": "^2.1.1"
   },
   "scripts": {
-    "build": "ncc build -e create-typescript-thing-script --out dist src/index.ts --external='@npmcli/run-script' && sed '1s;^;#!/usr/bin/env node\\n;' dist/index.js -i && chmod a+x dist/index.js",
+    "build": "rm -rf dist && tsc -p tsconfig.build.json && resolve-tspaths -p tsconfig.build.json && sed '1s;^;#!/usr/bin/env node\\n;' dist/index.js -i && chmod a+x dist/index.js",
     "format": "prettier .",
     "lint": "eslint --cache && tsc --noEmit",
     "test": "jest",
-    "prepack": "ncc build -e create-typescript-thing-script --out dist --minify src/index.ts --external='@npmcli/run-script' && sed '1s;^;#!/usr/bin/env node\\n;' dist/index.js -i && chmod a+x dist/index.js",
+    "prepack": "rm -rf dist && tsc -p tsconfig.build.json && resolve-tspaths -p tsconfig.build.json && sed '1s;^;#!/usr/bin/env node\\n;' dist/index.js -i && chmod a+x dist/index.js",
     "prepublish": "eslint --cache && tsc --noEmit",
-    "start": "ncc run -e create-typescript-thing-script src/index.ts --external='@npmcli/run-script' --external='prettier-plugin-organize-imports'"
+    "start": "node --loader ts-node/esm --loader @zebreus/resolve-tspaths/esm 'index.js'"
   },
   "files": [
-    "dist/index.js"
+    "dist/**"
   ],
   "keywords": [
     "application",
@@ -66,6 +59,14 @@
     "create-typescript-thing": "dist/index.js"
   },
   "dependencies": {
-    "@npmcli/run-script": "^4.1.3"
+    "chalk": "4",
+    "clipboardy": "^3.0.0",
+    "create-typescript-thing-lib": "^0.0.3",
+    "node-fetch": "2",
+    "open": "^8.4.0",
+    "ora": "^6.1.2",
+    "prompts": "^2.4.2",
+    "validate-npm-package-name": "^4.0.0",
+    "which": "^2.0.2"
   }
 }

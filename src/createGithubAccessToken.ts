@@ -1,4 +1,4 @@
-import { bold } from "chalk"
+import chalk from "chalk"
 import clipboard from "clipboardy"
 import fetch from "node-fetch"
 import open from "open"
@@ -91,10 +91,10 @@ const fetchToken = async (
 export const createGithubAccessToken = async () => {
   const clientId = "243bcc16248cdf06dce0"
   const code = await fetchCode(clientId)
-  console.log(`Your one-time code: ${bold(code.userCode)}`)
+  console.log(`Your one-time code: ${chalk.bold(code.userCode)}`)
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
 
-  rl.question(`${bold("Press enter")} to copy the code and open a browser at ${code.verificationUri}`, () => {
+  rl.question(`${chalk.bold("Press enter")} to copy the code and open a browser at ${code.verificationUri}`, () => {
     try {
       clipboard.writeSync(code.userCode)
     } catch (e) {

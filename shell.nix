@@ -1,9 +1,12 @@
+let
+  unstable = import (fetchTarball https://nixos.org/channels/nixos-unstable/nixexprs.tar.xz) { };
+in
 { pkgs ? import <nixpkgs> { } }:
 with pkgs;
 mkShell {
   nativeBuildInputs = [
-    nodejs-18_x
-    yarn
+    unstable.nodejs
+    unstable.yarn
     git
     jq
     moreutils

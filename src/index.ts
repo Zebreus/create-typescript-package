@@ -1,5 +1,5 @@
 import { getGithubCliCredentials } from "accessGithubCliCredentials"
-import { blue, red } from "chalk"
+import chalk from "chalk"
 import { createTypescriptThing, Options } from "create-typescript-thing-lib"
 import { createGithubAccessToken } from "createGithubAccessToken"
 import { createGithubRepo, getDefaultBranch, getUserInfo, getUserRepos } from "createGithubRepo"
@@ -694,14 +694,14 @@ const awaitWithTimeout = async <T>(promise: Promise<T>, timeout: number, default
     }, timeout)
   })
 
-  return await Promise<T>.race([promise, timeoutPromise])
+  return await (Promise<T>).race([promise, timeoutPromise])
 }
 
 const reviewSettings = async (settings: PackageSettings): Promise<PackageSettings> => {
   const repoExists = settings.repo ? validateGitRepo(settings.repo) : (async () => true)()
   const shortTimeoutRepoExists = (repoExists && (await awaitWithTimeout(repoExists, 100, true))) || false
 
-  console.log(`I will create the ${blue(settings.type)} package ${blue(settings.name)} into ${blue(settings.path)}`)
+  console.log(`I will create the ${chalk.blue(settings.type)} package ${chalk.blue(settings.name)} into ${chalk.blue(settings.path)}`)
   // if (settings.authorName || settings.authorEmail) {
   //   console.log(
   //     `I will set the author as ${chalk.blue(settings.authorName)}${
@@ -712,15 +712,15 @@ const reviewSettings = async (settings: PackageSettings): Promise<PackageSetting
 
   if (settings.monorepo) {
     console.log(
-      `I won't create a git repository, because the package is inside a ${blue("monorepo")} ${
-        settings.repo ? `(${blue(settings.repo)})` : ""
+      `I won't create a git repository, because the package is inside a ${chalk.blue("monorepo")} ${
+        settings.repo ? `(${chalk.blue(settings.repo)})` : ""
       }`
     )
   } else {
     if (settings.repo) {
       console.log(
-        `I will use the git repository at ${blue(settings.repo)} as the remote repository.
-        ${!shortTimeoutRepoExists ? red("The repository does not exist, please create it before continuing.") : ""}`
+        `I will use the git repository at ${chalk.blue(settings.repo)} as the remote repository.
+        ${!shortTimeoutRepoExists ? chalk.red("The repository does not exist, please create it before continuing.") : ""}`
       )
     } else {
       console.log(
@@ -799,7 +799,7 @@ const reviewSettings = async (settings: PackageSettings): Promise<PackageSetting
   switch (result.selection) {
     case "create": {
       if (settings.repo && !(await repoExists)) {
-        console.log(red("The repository does not exist, please create it before continuing."))
+        console.log(chalk.red("The repository does not exist, please create it before continuing."))
         return reviewSettings(settings)
       }
       return settings
