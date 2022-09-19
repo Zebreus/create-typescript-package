@@ -3162,10 +3162,10 @@ create-require@^1.1.0:
   resolved "https://registry.yarnpkg.com/create-require/-/create-require-1.1.1.tgz#c1d7e8f1e5f6cfc9ff65f9cd352d37348756c333"
   integrity sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==
 
-create-typescript-thing-lib@^0.0.4:
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/create-typescript-thing-lib/-/create-typescript-thing-lib-0.0.4.tgz#7219af73af7fc053caca9a44330d779fd62e79b9"
-  integrity sha512-6Mq00VfuGcdUTB+E6qh1mSMxCXQ22SP+dzoPwOnc6uM/SvYRldhHtKMkqfnqWbjlP6eABOlBtYM26pmA+xqksw==
+create-typescript-thing-lib@^0.0.5:
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/create-typescript-thing-lib/-/create-typescript-thing-lib-0.0.5.tgz#d73f6d4d03fa230b4cd413593d458a638466f92f"
+  integrity sha512-e3NegqMh8IQ2yaDfRq4gf413DxFblRveM6S662A+cMGmTbrfdBXxb5w+sqN8o5tDMM2KUpVpxJSmWW4s1239Dw==
   dependencies:
     install-pnpm-package "^0.5.2"
     isomorphic-git "^1.20.0"
