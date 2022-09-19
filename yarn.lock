@@ -3162,15 +3162,14 @@ create-require@^1.1.0:
   resolved "https://registry.yarnpkg.com/create-require/-/create-require-1.1.1.tgz#c1d7e8f1e5f6cfc9ff65f9cd352d37348756c333"
   integrity sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==
 
-create-typescript-thing-lib@^0.0.3:
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/create-typescript-thing-lib/-/create-typescript-thing-lib-0.0.3.tgz#d8132d91b97937e6cea9d9713da8c54f193ec09f"
-  integrity sha512-OH8VQ1SSdR/v85jLgJVX/xCPMZYUPZfC7BtWWIWE4nbEZBnpTiX6cBjCntd77Q/YHH5EqnCEjA96MxPyUhaLoA==
+create-typescript-thing-lib@^0.0.4:
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/create-typescript-thing-lib/-/create-typescript-thing-lib-0.0.4.tgz#7219af73af7fc053caca9a44330d779fd62e79b9"
+  integrity sha512-6Mq00VfuGcdUTB+E6qh1mSMxCXQ22SP+dzoPwOnc6uM/SvYRldhHtKMkqfnqWbjlP6eABOlBtYM26pmA+xqksw==
   dependencies:
     install-pnpm-package "^0.5.2"
     isomorphic-git "^1.20.0"
     prettier "^2.7.1"
-    prettier-plugin-organize-imports "^3.1.0"
 
 credentials-by-uri@^2.1.0:
   version "2.1.0"
@@ -6192,7 +6191,7 @@ prelude-ls@^1.2.1:
   resolved "https://registry.yarnpkg.com/prelude-ls/-/prelude-ls-1.2.1.tgz#debc6489d7a6e6b0e7611888cec880337d316396"
   integrity sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==
 
-prettier-plugin-organize-imports@^3.0.0, prettier-plugin-organize-imports@^3.1.0:
+prettier-plugin-organize-imports@^3.0.0:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/prettier-plugin-organize-imports/-/prettier-plugin-organize-imports-3.1.1.tgz#e581cb6fa528cf72f7d95b807ce38c3e51c3c27c"
   integrity sha512-6bHIQzybqA644h0WGUW3gpWEVbMBvzui5wCMRBi7qA++d5ov2xjjfDk8pxJJ/ardfZrGAwizKMq/fQMFdJ+0Zw==
