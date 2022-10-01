@@ -337,6 +337,11 @@ const selectType = async (settings: PackageSettings) => {
           description: "A interactive cli application",
         },
         {
+          title: "A react component",
+          value: "reactcomponent",
+          description: "A react component library",
+        },
+        {
           title: "A web3 blockchain project with NFTs",
           value: "web3-nft",
           description: "idk",
@@ -839,7 +844,6 @@ const reviewSettings = async (settings: PackageSettings): Promise<PackageSetting
   }))
 
   //TODO: Determine author name
-
   const s1 = selectType({
     type: "library",
     invokeDirectory: path.normalize(process.cwd()),
