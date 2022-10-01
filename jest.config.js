@@ -1,8 +1,7 @@
-module.exports = {
-  roots: ["<rootDir>/src"],
-  moduleDirectories: ["node_modules", "src"],
+export default {
+  extensionsToTreatAsEsm: ['.ts'],
   transform: {
-    "^.+\\.tsx?$": "ts-jest",
+    "^.+\\.tsx?$": "@zebreus/resolve-tspaths/jest",
   },
   coverageThreshold: {
     global: {
