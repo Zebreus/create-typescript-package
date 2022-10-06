@@ -60,7 +60,7 @@
   "dependencies": {
     "chalk": "4",
     "clipboardy": "^3.0.0",
-    "create-typescript-thing-lib": "^0.0.8",
+    "create-typescript-thing-lib": "^0.0.9",
     "node-fetch": "2",
     "open": "^8.4.0",
     "ora": "^6.1.2",

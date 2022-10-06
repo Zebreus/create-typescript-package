@@ -342,6 +342,11 @@ const selectType = async (settings: PackageSettings) => {
           description: "A react component library",
         },
         {
+          title: "A nextjs webapp",
+          value: "nextjs",
+          description: "A nextjs webapp",
+        },
+        {
           title: "A web3 blockchain project with NFTs",
           value: "web3-nft",
           description: "idk",

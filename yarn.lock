@@ -3173,10 +3173,10 @@ create-require@^1.1.0:
   resolved "https://registry.yarnpkg.com/create-require/-/create-require-1.1.1.tgz#c1d7e8f1e5f6cfc9ff65f9cd352d37348756c333"
   integrity sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==
 
-create-typescript-thing-lib@^0.0.8:
-  version "0.0.8"
-  resolved "https://registry.yarnpkg.com/create-typescript-thing-lib/-/create-typescript-thing-lib-0.0.8.tgz#c31286be75e7bc06ef3121d7d9cee221e284473b"
-  integrity sha512-QgQUhRbzxOZc6NV54PwASBtPQoE3Tdip2iANSvGbKMbcKzg85vnduUDO7xdbm9cIJdcztui6oyro/sBTabv17w==
+create-typescript-thing-lib@^0.0.9:
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/create-typescript-thing-lib/-/create-typescript-thing-lib-0.0.9.tgz#824bf617335376e15ec80f2cdac0e41fc73d2752"
+  integrity sha512-yADu846PiwQDQ8jPJMwd21R4cHNr11DfcvNJzCeLeo44aT/8/IZaMBI5H9ZO1+OMkZd1IQZaMrdbmcM6MEM2qw==
   dependencies:
     install-pnpm-package "^0.5.2"
     isomorphic-git "^1.20.0"
